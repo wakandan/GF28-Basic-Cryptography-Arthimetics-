@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/*Class of basic GF28 operations. The resource files should 
+ * be place appropriately before usage. Resource files are files
+ * contains operation table with pre-computed data using a python code*/
 public class Ops {
     int[][] sum_table;
 
@@ -19,6 +22,7 @@ public class Ops {
 
     final static private int NUM_ROW = 255;
 
+    /*Read resource files and populate lookup tables*/
     public Ops() {
         try {
             sum_table = read_file("resources/sum_table.txt");
@@ -34,6 +38,8 @@ public class Ops {
         }
     }
 
+    /*Read resource files for add table, multiplication table and division table
+     * The result will be a 2-dimension array*/
     private int[][] read_file(String filename) throws FileNotFoundException,
             IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -51,6 +57,7 @@ public class Ops {
         return result;
     }
 
+    /*Read file function for inversion table. The result would be a simple array*/
     private int[] read_file1(String filename) throws FileNotFoundException,
             IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -65,14 +72,16 @@ public class Ops {
         }
         return result;
     }
+    
+//    /*Just for testing*/
+//    public static void main(String[] args) {
+//        Ops ops = new Ops();
+//        for (int i = 0; i < NUM_ROW; i++) {
+//            System.out.print(ops.inv_table[i] + " ");
+//        }
+//    }
 
-    public static void main(String[] args) {
-        Ops ops = new Ops();
-        for (int i = 0; i < NUM_ROW; i++) {
-            System.out.print(ops.inv_table[i] + " ");
-        }
-    }
-
+    /*Add 2 numbers in GF28*/
     public int add(int a, int b) {
         if (a == 0 || b == 0)
             return a + b;
@@ -80,6 +89,7 @@ public class Ops {
             return sum_table[a][b];
     }
 
+    /*Multiply 2 numbers in GF28*/
     public int mul(int a, int b) {
         if (a == 0 || b == 0)
             return 0;
@@ -87,6 +97,7 @@ public class Ops {
             return mul_table[a][b];
     }
 
+    /*Inverse a number in GF28*/
     public int inv(int a) {
         if (a == 0)
             return -1;
