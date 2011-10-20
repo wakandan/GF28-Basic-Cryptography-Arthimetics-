@@ -1,50 +1,62 @@
 package cryptography2;
 
 public abstract class BlockCipher {
-    protected static final int NUM_ROUND = 3;
+	private static final int NUM_ROUND = 3;
+	private static final int BLOCK_SIZE = 4;
 
-    public int[] key;
+	static int getBlockSize() {
+		return BLOCK_SIZE;
+	}
 
-    public abstract int[] calcRoundKey(int roundNum);
+	public int[] key;
 
-    public abstract int[] calcMsg(int[] msg, int[] key);
+	public int[][] keystream;
 
-    public abstract int[] init(int[] msg);
+	public void setKeystream(int[][] keystream) {
+		this.keystream = keystream;
+	}
 
-    public abstract int[] finalize(int[] msg);
+	public static int getNumRound() {
+		return NUM_ROUND;
+	}
 
-    public int[][] initKeys(int[] key, int num_round) {
-        /*
-         * Generate key set for use. Each round will just reference a key, no
-         * need to generate again
-         */
-        int[][] results = new int[num_round][key.length];
-        int[] tmpKey = key;
-        for (int i = 0; i < num_round; i++) {
-            results[i] = Key.encrypt(tmpKey, i + 1);
-            tmpKey = results[i];
-        }
-        return results;
-    }
+	public abstract int[] calcRoundKey(int roundNum);
 
-    public int[][] keys;
+	public abstract int[] calcMsg(int[] msg, int[] key);
 
-    protected void printarray(int[] a) {
-        for (int i = 0; i < a.length; i++)
-            System.out.print(a[i] + " ");
-        System.out.println("");
-    }
+	public abstract int[] init(int[] msg);
 
-    public int[] work(int[] msg, int[] key) {
-        this.key = key;
-        int[] roundKey = key;
-        int[] tmpMsg = init(msg);
-        keys = initKeys(key, NUM_ROUND);
-        for (int i = 1; i <= NUM_ROUND; i++) {
-            roundKey = calcRoundKey(i);
-            /* First round, need to use an iv value */
-            tmpMsg = calcMsg(tmpMsg, roundKey);
-        }
-        return finalize(tmpMsg);
-    }
+	public abstract int[] finalize(int[] msg);
+
+	protected void printarray(int[] a) {
+		for (int i = 0; i < a.length; i++)
+			System.out.print(a[i] + " ");
+		System.out.println("");
+	}
+
+	public int[] work(int[] msg) {
+		int[] roundKey;
+		int[] tmpMsg = init(msg);
+		for (int i = 1; i <= NUM_ROUND; i++) {
+			roundKey = calcRoundKey(i);
+			/* First round, need to use an iv value */
+			tmpMsg = calcMsg(tmpMsg, roundKey);
+		}
+		return finalize(tmpMsg);
+	}
+
+	public BlockCipher setKey(int[] key) {
+		this.key = key;
+		return this;
+	}
+
+	public BlockCipher makeKeyStream() {
+		keystream = new int[NUM_ROUND][key.length];
+		int[] tmpKey = key;
+		for (int i = 0; i < NUM_ROUND; i++) {
+			keystream[i] = Key.encrypt(tmpKey, i + 1);
+			tmpKey = keystream[i];
+		}
+		return this;
+	}
 }
