@@ -11,8 +11,7 @@ import java.nio.channels.FileChannel;
 import java.util.Random;
 
 public class C2 {
-    int[] stream;
-
+    int[] stream;   
     private final int BLOCK_SIZE = 4;
 
     public C2(String filename) {
@@ -38,7 +37,7 @@ public class C2 {
         }
     }
 
-    private void encrypt(int[] key, String outfilename) throws IOException {
+    public void encrypt(int[] key, String outfilename) throws IOException {
         /* Encrypt a stream of int in CBC mode */
         int i = 0;
         Random randGen = new Random();
@@ -79,7 +78,7 @@ public class C2 {
         fw.close();
     }
 
-    private void decrypt(int[] key, String outfilename)
+    public void decrypt(int[] key, String outfilename)
             throws FileNotFoundException, IOException {
         /* Decrypt a stream of int in CBC mode */
         int[] iv = new int[BLOCK_SIZE];
@@ -107,7 +106,7 @@ public class C2 {
             /* This should be the plain text */
             tmpMsg = MatrixOps.add(prevMsg, tmpMsg);
             for(int j=0; j<BLOCK_SIZE; j++)
-                System.out.print((char)tmpMsg[j]);
+                fw.write(tmpMsg[j]);
             /* Copy the plain text for the next iteration */
             copy(prevMsg, msg, 0);
             i += BLOCK_SIZE;
