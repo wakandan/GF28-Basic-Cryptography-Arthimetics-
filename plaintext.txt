@@ -1,1 +1,28 @@
-Mohammed Abdul Karim (1863–1909) was a Muslim Indian attendant of Queen Victoria who gained her affection during the final fifteen years of her reign. Karim was born near Jhansi in British India, the son of a hospital assistant. In 1887, Victoria's Golden Jubilee year, Karim was one of two Indians selected to become servants to the Queen. Victoria came to like him a great deal and gave him the title of "Munshi", a Hindi-Urdu word often translated as "clerk" or "teacher". Victoria appointed him her Indian Secretary, showered him with honours, and obtained a land grant for him in India. The close relationship between Karim and the Queen led to friction within the Royal Household, the other members of which felt themselves to be superior to him. The Queen insisted on taking Karim with her on her travels, which caused angry arguments between her and her attendants. Following Victoria's death in 1901 her successor, Edward VII, returned Karim to India and ordered the confiscation and destruction of the Munshi's correspondence with Victoria.
+import java.io.*;
+
+public class DeleteFile{
+  private static void deletefile(String file){
+  File f1 = new File(file);
+  boolean success = f1.delete();
+  if (!success){
+  System.out.println("Deletion failed.");
+  System.exit(0);
+  }else{
+  System.out.println("File deleted.");
+    }
+  }
+  public static void main(String[] args){
+  switch(args.length){
+  case 0: System.out.println("File has not mentioned.");
+  System.exit(0);
+  case 1: deletefile(args[0]);
+  System.exit(0);
+  default : System.out.println("Multiple files are not allow.");
+  System.exit(0);
+  }
+  }
+}
+Download File Deletion Example
+
+Related Tags for Java - Deleting the file or Directory:
+java,  c,  string,  file,  class,  function,  delete,  path,  directory,  fun,  io,  trac,  name,  using,  this,  package,  abstract,  if,  ie,  example,  call,  unc,  exists,  program,  nat,  to,  ram,  exam,  presentation,  names,  ci,  lan,  e,  il,  representation,  bstr,  pe,  in,  java.io,  cal,  as,  m,  nt,  tr,  ca,  let,  j,  pack,  cl,  es,  explanation,  spec,  sts,  dir,  func,  all,  age,  plan,  me,  pro,  ack,  tor,  xa,  which,  xamp,  s,  rect,  sp,  del,  ctor,  direct,  bst,  at,  pac,  rac,  k,  is,  ir,  ha,  ll,  mpl,  pre,  and,  ar,  act,  str,  repr,  xp,  va,  xi,  s,  s,  ri,  ring,  th,  av,  st,  ab,  ati,  hat,  exi,  cto,  ecl,  ple,  pl,  pr,  nd,  on,  ogr,  o
