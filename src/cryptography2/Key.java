@@ -10,7 +10,6 @@ package cryptography2;
  * @author Xinzhen
  */
 public class Key {
-    private BasicFunctions BFs = new BasicFunctions();
 
     // pass in key of r-1 and return key of r
     public static int[] encrypt(int[] k, int r) {

@@ -2,10 +2,12 @@ package cryptography2;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +20,7 @@ public class TestBlockCipher {
 
     @Before
     public void setUp() {
-        GF28.init("D:/doc/workspace/CryptoAssignment1/src/cryptography2/table.txt");
+        GF28.init("table.txt");
     }
 
     @Test
@@ -31,8 +33,8 @@ public class TestBlockCipher {
 
     @Test
     public void testEncryptDecrypt() {
-        int[] encrypted = new BlockEncryption().work(msg, key);
-        int[] decrypted = new BlockDecryption().work(encrypted, key);
+        int[] encrypted = new BlockEncryption().setKey(key).makeKeyStream().work(msg);
+        int[] decrypted = new BlockDecryption().setKey(key).makeKeyStream().work(encrypted);
         for (int i = 0; i < encrypted.length; i++)
             assertEquals(msg[i], decrypted[i]);
 
@@ -50,16 +52,47 @@ public class TestBlockCipher {
         for(int i=0; i<input.length; i++)
             fw.write(input[i]);
         fw.close();
-        C2 blackbox = new C2(inputFilename);
-        blackbox.encrypt(key, outFilename);
-        blackbox = new C2(outFilename);
-        blackbox.decrypt(key, decipheredFilename);
+        C2 blackbox = new C2(key);
+        blackbox.encrypt(inputFilename, outFilename);
+        blackbox.decrypt(outFilename, decipheredFilename);
         FileReader fr = new FileReader(decipheredFilename);
         for(int i=0; i<input.length; i++) {
             output[i] = fr.read();
             assertEquals(input[i], output[i]);
         }
         fr.close();
+        (new File(outFilename)).delete();
+        (new File(decipheredFilename)).delete();
+    }
+    
+    @Test
+    public void testProgram() throws IOException {
+    	String[] encrypt_args = {"e", "test_plaintext.txt", "key.txt"}; 
+    	C2.main(encrypt_args);
+    	File plainFile = new File("test_plaintext.txt");
+    	File encryptedFile = new File("encrypted_test_plaintext.txt");
+    	assertTrue(encryptedFile.exists());
+    	String[] decrypt_args = {"d", "encrypted_test_plaintext.txt", "key.txt"}; 
+    	C2.main(decrypt_args);  
+    	File decryptedFile = new File("decrypted_encrypted_test_plaintext.txt");
+    	assertTrue(decryptedFile.exists());
+    	assertEquals(plainFile.length(), decryptedFile.length());
+    	long len = plainFile.length();
+    	FileReader plainFileReader = new FileReader("test_plaintext.txt");
+    	FileReader decryptedFileReader = new FileReader("decrypted_encrypted_test_plaintext.txt");
+    	for(int i=0; i<len%10; i++)
+    		assertEquals(plainFileReader.read(), decryptedFileReader.read());
+    	plainFileReader.close();
+    	decryptedFileReader.close();
+    	encryptedFile.delete();
+    	decryptedFile.delete();
+    	
+    }
+    
+    @After
+    public void tearDown() {
+    	
+    	
     }
     
     public void printarray(int[] a) {

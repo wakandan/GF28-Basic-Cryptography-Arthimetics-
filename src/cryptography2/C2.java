@@ -1,13 +1,12 @@
 package cryptography2;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
 import java.util.Random;
 
 public class C2 {
@@ -82,6 +81,10 @@ public class C2 {
 			/* Get the plain text block */
 			for (int j = low; j < high; j++)
 				msg[j % blockSize] = stream[j];
+			if ((high - low) % blockSize != 0)
+				/* Do padding */
+				for (int j = high % blockSize; j < blockSize; j++)
+					msg[j] = 0xff;
 			/* XOR the current block with cipher text, then encrypt */
 			prevMsg = blockCipher.work(MatrixOps.add(msg, prevMsg));
 			for (int j = 0; j < blockSize; j++)
@@ -93,13 +96,13 @@ public class C2 {
 
 	public void decrypt(String inputFilename, String outfilename)
 			throws FileNotFoundException, IOException {
-		/* Decrypt a stream of int in CBC mode */				
+		/* Decrypt a stream of int in CBC mode */
 		this.readFromFile(inputFilename);
 		blockCipher = new BlockDecryption();
 		this.setBlockCipher(blockCipher);
 		FileOutputStream fw = new FileOutputStream(outfilename);
 		int[] msg = new int[blockSize];
-		int[] tmpMsg = new int[blockSize];		
+		int[] tmpMsg = new int[blockSize];
 		int[] iv = new int[blockSize];
 		/* Read the first 4 bytes for initial value */
 		for (int i = 0; i < blockSize; i++)
@@ -118,7 +121,7 @@ public class C2 {
 			tmpMsg = blockCipher.work(msg);
 			/* This should be the plain text */
 			tmpMsg = MatrixOps.add(prevMsg, tmpMsg);
-			for (int j = 0; j < blockSize; j++)
+			for (int j = 0; j < blockSize && tmpMsg[j] != 0xff; j++)
 				fw.write(tmpMsg[j]);
 			/* Copy the plain text for the next iteration */
 			copy(prevMsg, msg, 0);
@@ -127,30 +130,38 @@ public class C2 {
 		fw.close();
 	}
 
-	public static void main(String[] argv) {
-		boolean encrypt = false;
-		GF28.init("D:/doc/workspace/CryptoAssignment1/src/cryptography2/table.txt");
-		int[] key = { 44, 55, 66, 77 };
-		String infilename;
-		String outfilename;
-		if (encrypt) {
-			infilename = "plaintext.txt";
-			outfilename = "ciphertext.txt";
-		} else {
-			infilename = "ciphertext.txt";
-			outfilename = "decipheredtext.txt";
-		}
+	public static void main(String[] argv) throws IOException {
+		if (argv.length != 3)
+			bailOut();
+		/* Init GF28 arithmetic data */
+		GF28.init("table.txt");
+		int[] key = readKeyFile(argv[2]);
+		/* Create a new blackbox */
 		C2 blackBox = new C2(key);
-		try {
-			if (encrypt) {
-				blackBox.encrypt(infilename, outfilename);
-			} else {
-				blackBox.decrypt(infilename, outfilename);
-			}
-		} catch (IOException e) {
-			System.out.println("Can not write to file " + outfilename);
-			e.printStackTrace();
-		}
+
+		String infilename = argv[1];
+		String outfilename;
+
+		/* Check for the action */
+		if (argv[0].toUpperCase().compareTo("E") == 0) {
+			outfilename = "encrypted_" + infilename;
+			blackBox.encrypt(infilename, outfilename);
+		} else if (argv[0].toUpperCase().compareTo("D") == 0) {
+			outfilename = "decrypted_" + infilename;
+			blackBox.decrypt(infilename, outfilename);
+		} else
+			bailOut();
+	}
+
+	private static int[] readKeyFile(String filename) throws IOException {
+		/* Read the key */
+		int[] inputkey;
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		String[] inputKeyStr = br.readLine().split(" ");
+		inputkey = new int[inputKeyStr.length];
+		for (int i = 0; i < inputKeyStr.length; i++)
+			inputkey[i] = Integer.parseInt(inputKeyStr[i]);
+		return inputkey;
 	}
 
 	private void copy(int[] a, int[] b, int start) {
@@ -159,8 +170,8 @@ public class C2 {
 			a[i + start] = b[i];
 	}
 
-	private void printarray(int[] a) {
-		for (int i = 0; i < a.length; i++)
-			System.out.print(a[i] + " ");
+	public static void bailOut() {
+		System.out.println("Usage: C2 <action> <data_file_name> <key_file>");
+		System.exit(1);
 	}
 }
