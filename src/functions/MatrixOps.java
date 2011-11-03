@@ -81,8 +81,19 @@ public class MatrixOps {
         return result;
     }       
 
-    /*Inverse a matrix in GF2_8*/
+    /*Inverse a matrix in GF2_8.
+     * /*Reference http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html*/
 //    public int[][] minv(int[][] a){
 //        
 //    }
+    
+    public int[][] cofactorMatrix(int[][] a, int i, int j){
+        int[][] result = new int[a.length][a[0].length];
+        for(int i=0; i<a.length; i++) {
+            for(int j=0; j<a[0].length; j++) {
+                
+            }
+        }
+    }
+    
 }

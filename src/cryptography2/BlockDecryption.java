@@ -5,7 +5,7 @@ public class BlockDecryption extends BlockCipher {
 	@Override
 	public int[] calcRoundKey(int roundNum) {
 		/* Apply key in the reverse order */
-		return keystream[roundNum - 1];
+		return keystream[keystream.length-roundNum];
 	}
 
 	@Override

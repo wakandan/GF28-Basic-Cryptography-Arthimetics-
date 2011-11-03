@@ -5,7 +5,7 @@ public class BlockEncryption extends BlockCipher {
 	@Override
 	public int[] calcRoundKey(int numRound) {
 		// TODO Auto-generated method stub
-		return keystream[keystream.length-numRound];
+		return keystream[numRound-1];
 	}
 
 	@Override

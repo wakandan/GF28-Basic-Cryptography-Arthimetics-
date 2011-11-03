@@ -24,4 +24,12 @@ public class MatrixOps {
         }
         return result;
     }
+    
+    /*Using GF28 to inverse each of the array elements*/
+    public static int[] inv(int[] a) {
+    	int[] r = new int[a.length];
+    	for(int i=0; i<a.length; i++)
+    		r[i] = GF28.inv(a[i]);
+    	return r;
+    }	
 }

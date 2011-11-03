@@ -53,4 +53,8 @@ public abstract class BlockCipher {
 		}
 		return this;
 	}
+	
+	public int[][] getKeyStream(){
+		return this.keystream;
+	}
 }

@@ -1,10 +1,11 @@
 package functions;
 
 public class Cipher {
-    Ops ops;
-    MatrixOps mops;
+    Ops ops;    /*GF28 operations object*/
+    MatrixOps mops; /*GF28 operations on matrices*/
     int[][] D, D1;
     int[] C0;
+    
     public Cipher() {
         this.ops = new Ops();
         this.mops = new MatrixOps();

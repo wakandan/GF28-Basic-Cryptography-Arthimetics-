@@ -15,6 +15,7 @@ public class C2 {
 	int[] key;
 	int numRound;
 	int blockSize;
+	int[] iv = null;
 	BlockCipher blockCipher;
 
 	public C2(int[] key) {
@@ -28,6 +29,17 @@ public class C2 {
 		this.makeKeyStream();
 		this.blockCipher.setKeystream(keystream);
 		this.blockCipher.setKey(key);
+	}
+
+	public void setIV(int[] iv) {
+		this.iv = iv;
+	}
+
+	public void genRandomIV() {
+		this.iv = new int[blockSize];
+		Random randGen = new Random();
+		for (int j = 0; j < blockSize; j++)
+			iv[j] = randGen.nextInt(255);
 	}
 
 	private void makeKeyStream() {
@@ -53,9 +65,10 @@ public class C2 {
 	public void encrypt(String inputFilename, String outfilename)
 			throws IOException {
 		/* Encrypt a stream of int in CBC mode */
-		int i = 0;
+
 		Random randGen = new Random();
 		FileOutputStream fw = null;
+
 		/* Create a new encryption block to encrypt the stream of byte */
 		blockCipher = new BlockEncryption();
 		this.setBlockCipher(blockCipher);
@@ -63,29 +76,34 @@ public class C2 {
 		fw = new FileOutputStream(outfilename);
 
 		/* Generate the initial value. */
-		int[] iv = new int[blockSize];
 		int[] iv_ECB = new int[blockSize];
-		for (int j = 0; j < blockSize; j++)
-			iv[j] = randGen.nextInt(255);
+		if (this.iv == null)
+			this.genRandomIV();
+
 		iv_ECB = blockCipher.work(iv);
+
 		/* Encrypt the iv in ECB mode and save it first in the file */
 		for (int j = 0; j < blockSize; j++)
 			fw.write(iv_ECB[j]);
 		int[] prevMsg = iv;
+		int i = 0;
 		while (i < stream.length) {
 			int low = i;
 			int high = i + blockSize;
 			if (high >= stream.length)
 				high = stream.length;
 			int[] msg = new int[blockSize];
+
 			/* Get the plain text block */
 			for (int j = low; j < high; j++)
 				msg[j % blockSize] = stream[j];
+
+			/* Do padding */
 			if ((high - low) % blockSize != 0)
-				/* Do padding */
 				for (int j = high % blockSize; j < blockSize; j++)
 					msg[j] = 0xff;
-			/* XOR the current block with cipher text, then encrypt */
+
+			/* XOR the current block with plain text, then encrypt */
 			prevMsg = blockCipher.work(MatrixOps.add(msg, prevMsg));
 			for (int j = 0; j < blockSize; j++)
 				fw.write(prevMsg[j]);
@@ -94,9 +112,10 @@ public class C2 {
 		fw.close();
 	}
 
+	/* Decrypt a stream of int in CBC mode */
 	public void decrypt(String inputFilename, String outfilename)
 			throws FileNotFoundException, IOException {
-		/* Decrypt a stream of int in CBC mode */
+
 		this.readFromFile(inputFilename);
 		blockCipher = new BlockDecryption();
 		this.setBlockCipher(blockCipher);
@@ -104,13 +123,16 @@ public class C2 {
 		int[] msg = new int[blockSize];
 		int[] tmpMsg = new int[blockSize];
 		int[] iv = new int[blockSize];
+
 		/* Read the first 4 bytes for initial value */
 		for (int i = 0; i < blockSize; i++)
 			iv[i] = stream[i];
+
 		/* Decipher the initial value, which was saved first in the file */
 		iv = blockCipher.work(iv);
 		int[] prevMsg = iv;
 		int i = blockSize;
+
 		/* While reaching the beginning of the file (as we read backward) */
 		while (i < stream.length) {
 			/* Get from the second cipher text block */
@@ -119,10 +141,12 @@ public class C2 {
 
 			/* Decrypt and xor with the previous block */
 			tmpMsg = blockCipher.work(msg);
+
 			/* This should be the plain text */
 			tmpMsg = MatrixOps.add(prevMsg, tmpMsg);
 			for (int j = 0; j < blockSize && tmpMsg[j] != 0xff; j++)
 				fw.write(tmpMsg[j]);
+
 			/* Copy the plain text for the next iteration */
 			copy(prevMsg, msg, 0);
 			i += blockSize;
@@ -171,7 +195,10 @@ public class C2 {
 	}
 
 	public static void bailOut() {
-		System.out.println("Usage: C2 <action> <data_file_name> <key_file>");
+		System.out
+				.println("Usage: C2 <action(D|E)> <data_file_name> <key_file>");
+		System.out
+				.println("Key file should contains 4 DECIMAL number in (0-255), space delimited");
 		System.exit(1);
 	}
 }
