@@ -1,12 +1,14 @@
 package cryptography2;
 
 /**
- * @author Bruce Nguyen
+ * @author: Bruce Nguyen
+ * @maintainer: Kand 
  */
 public class BasicFunctions {
     // Condition: n > a > 0
     private int t1, t2, t3, a1, a2, a3, b1, b2, b3, q;
 
+    /*Find inversion using Extended Euclid algorithm*/
     public int inverse(int a, int irreducible_polynomial) {
         if (a == 0)
             return 0;
@@ -36,14 +38,17 @@ public class BasicFunctions {
         return b2;
     }
 
+    /*Add 2 numbers. Basically just XOR and MOD the polynomial*/
     public int add(int a, int b, int irreducible_polynomial) {
         return modulus(a ^ b, irreducible_polynomial);
     }
-
+    
+    /*Subtract 2 numbers. Same as add function*/
     public int minus(int a, int b, int irreducible_polynomial) {
         return modulus(a ^ b, irreducible_polynomial);
     }
 
+    /*Multiply 2 numbers*/
     public int multiply(int a, int b, int irreducible_polynomial) {
         int result = 0;
         int temp;
@@ -72,6 +77,7 @@ public class BasicFunctions {
         return result;
     }
 
+    /*Divide a by b, using multiplication of a and inverse of b*/
     public int divide(int n, int a, int irreducible_polynomial) {// return n/a
                                                                  // in GF(2^8)
         if (n < a)
@@ -105,6 +111,7 @@ public class BasicFunctions {
 //        return multiply(n, inverse(a, irreducible_polynomial), irreducible_polynomial);
     }
 
+    /*Self explained name */
     public int modulus(int n, int a) {// n mod a
         if (n < a)
             return n;

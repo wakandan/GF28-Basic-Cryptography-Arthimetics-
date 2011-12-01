@@ -3,6 +3,7 @@ package cryptography2;
 /**
  *
  * @author Nguyen Quoc Phuong
+ * @maintainer Kand
  */
 
 //convetion: 
@@ -14,6 +15,10 @@ import java.util.*;
 public class GF28 {
     static private final int constant = 256;
 
+    /*This function carries out add, mul and inverse of all 
+     * possible numbers. Outputs are written into a file to be read 
+     * later in user application as look up tables to minimize 
+     * computation effort*/
     static public void initialized(String FileName, int ip) {
         BasicFunctions BFs = new BasicFunctions();
         try {
